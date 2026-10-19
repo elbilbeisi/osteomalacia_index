@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Osteomalacia Index</title>
+<meta name="description" content="McKenna osteomalacia/osteoporosis discriminant index (J Clin Pathol 1983;36:245-252)">
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1b2430; --muted:#5d6b7a; --line:#dde2e8;
+  --accent:#1f5f8b; --accent-soft:#e7f0f7;
+  --om:#b4442e; --om-soft:#fbeae6;
+  --bx:#a8770d; --bx-soft:#fbf3e0;
+  --op:#2f7d4f; --op-soft:#e6f4ec;
+  --warn:#8a5a00; --warn-soft:#fff6dd;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161c; --card:#1a2129; --ink:#e6ebf0; --muted:#97a4b2; --line:#2c3642;
+    --accent:#6fb0e0; --accent-soft:#1d2e3d;
+    --om:#ee8a74; --om-soft:#3a221d; --bx:#e3b54c; --bx-soft:#352c17;
+    --op:#71c793; --op-soft:#1b3326; --warn:#e3b54c; --warn-soft:#352c17;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161c; --card:#1a2129; --ink:#e6ebf0; --muted:#97a4b2; --line:#2c3642;
+  --accent:#6fb0e0; --accent-soft:#1d2e3d;
+  --om:#ee8a74; --om-soft:#3a221d; --bx:#e3b54c; --bx-soft:#352c17;
+  --op:#71c793; --op-soft:#1b3326; --warn:#e3b54c; --warn-soft:#352c17;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{max-width:1100px;margin:0 auto;padding:22px 16px 6px}
+header .clinic{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:22px;margin:4px 0 2px}
+header p{margin:0;color:var(--muted);font-size:13.5px}
+main{max-width:1100px;margin:0 auto;padding:12px 16px 40px;display:grid;grid-template-columns:1fr 400px;gap:18px;align-items:start}
+@media (max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.card h2{font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;padding:9px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .lbl{flex:1 1 220px}
+.row .lbl small{display:block;color:var(--muted);font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{padding:6px 12px;cursor:pointer;font-size:13.5px;border-left:1px solid var(--line);user-select:none}
+.seg label:first-of-type{border-left:0}
+.seg input:checked+label{background:var(--accent);color:#fff}
+.seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
+.num{display:inline-flex;gap:6px;align-items:center}
+input[type=number],input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+input[type=number]{width:96px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted);margin-top:4px;flex-basis:100%}
+.derived{font-size:12.5px;color:var(--muted);flex-basis:100%}
+.pts{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--muted);min-width:64px;text-align:right}
+aside{position:sticky;top:12px}
+@media (max-width:860px){aside{position:static}}
+.score{text-align:center;padding:6px 0 10px}
+.score .big{font-size:52px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.bar{position:relative;height:14px;border-radius:7px;margin:14px 0 4px;background:linear-gradient(90deg,var(--op-soft) 0 15%,var(--bx-soft) 15% 35%,var(--om-soft) 35% 100%);border:1px solid var(--line)}
+.bar .mk{position:absolute;top:-5px;width:3px;height:22px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .2s}
+.ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);position:relative;height:14px}
+.ticks span{position:absolute;transform:translateX(-50%)}
+.verdict{border-radius:10px;padding:12px 14px;margin-top:12px;font-size:14px}
+.verdict b{display:block;font-size:15.5px;margin-bottom:3px}
+.v-om{background:var(--om-soft);border-left:4px solid var(--om)}
+.v-bx{background:var(--bx-soft);border-left:4px solid var(--bx)}
+.v-op{background:var(--op-soft);border-left:4px solid var(--op)}
+.v-na{background:var(--bg);border-left:4px solid var(--line)}
+.warn{background:var(--warn-soft);color:var(--ink);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;font-size:13px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:12px}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+tr.ex td{color:var(--muted);font-style:italic}
+details{margin-top:12px;font-size:13.5px}
+summary{cursor:pointer;color:var(--accent);font-weight:600}
+.btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.notes{font-size:13px;color:var(--muted)}
+.notes li{margin-bottom:6px}
+.ref{font-size:12.5px;color:var(--muted)}
+.print-only{display:none}
+@media print{
+  body{background:#fff;color:#000;font-size:12px}
+  .card{border:1px solid #bbb;break-inside:avoid}
+  .no-print,details{display:none!important}
+  .print-only{display:block}
+  main{display:block}
+  aside{position:static}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="clinic">Jordan Bones &amp; Stones Clinic · Hazem Bilbeisi Endocrine Clinic</div>
+  <h1>Osteomalacia / Osteoporosis Discriminant Index</h1>
+  <p>McKenna MJ et al. <i>J Clin Pathol</i> 1983;36:245–252. Index % = points scored ÷ points possible for the tests available.</p>
+</header>
+
+<main>
+<section>
+  <div class="card">
+    <h2>Patient</h2>
+    <div class="row"><div class="lbl">Patient ID / name <small>Optional, for the printout only — not stored</small></div>
+      <input type="text" id="pid" style="width:220px"></div>
+    <div class="row"><div class="lbl">Renal function <small>Derivation cohort had normal renal function only</small></div>
+      <div class="seg"><input type="radio" name="renal" id="ren0" value="0" checked><label for="ren0">Normal</label><input type="radio" name="renal" id="ren1" value="1"><label for="ren1">Impaired</label></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Clinical features</h2>
+    <div class="row"><div class="lbl">Limb pain <small>Includes limb + back pain. Back pain alone scores 0 (specificity 0%)</small></div>
+      <div class="seg"><input type="radio" name="limb" id="limb1" value="1"><label for="limb1">Yes</label><input type="radio" name="limb" id="limb0" value="0" checked><label for="limb0">No</label></div>
+      <span class="pts" id="p_limb"></span></div>
+    <div class="row"><div class="lbl">Proximal myopathy</div>
+      <div class="seg"><input type="radio" name="myo" id="myo1" value="1"><label for="myo1">Yes</label><input type="radio" name="myo" id="myo0" value="0" checked><label for="myo0">No</label></div>
+      <span class="pts" id="p_myo"></span></div>
+  </div>
+
+  <div class="card">
+    <h2>Chemistry</h2>
+    <div class="row"><div class="lbl">Serum calcium (total, uncorrected) <small>Leave blank if unavailable</small></div>
+      <span class="num"><input type="number" id="ca" step="0.01" min="0"><select id="caU"><option value="mmol">mmol/L</option><option value="mg">mg/dL</option></select></span></div>
+    <div class="row"><div class="lbl">Serum phosphate</div>
+      <span class="num"><input type="number" id="po" step="0.01" min="0"><select id="poU"><option value="mmol">mmol/L</option><option value="mg">mg/dL</option></select></span>
+      <span class="pts" id="p_cap"></span>
+      <div class="derived" id="capTxt">Ca × P product: —</div></div>
+
+    <div class="row"><div class="lbl">Alkaline phosphatase (IU/L) <small>Scored only if liver function tests are normal</small></div>
+      <input type="number" id="alp" step="1" min="0"><span class="pts" id="p_alp"></span>
+      <label class="chk"><input type="checkbox" id="alpEx"> Abnormal LFTs / liver disease — exclude ALP from the index</label>
+      <div class="derived" id="alpTxt"></div></div>
+
+    <div class="row"><div class="lbl">Serum 25(OH)D</div>
+      <span class="num"><input type="number" id="vd" step="0.1" min="0"><select id="vdU"><option value="nmol">nmol/L</option><option value="ng">ng/mL</option></select></span>
+      <span class="pts" id="p_vd"></span>
+      <label class="chk"><input type="checkbox" id="vdEx"> On parent vitamin D supplements — exclude 25(OH)D from the index</label>
+      <div class="derived" id="vdTxt"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Radiology</h2>
+    <div class="row"><div class="lbl">Pseudofractures (Looser zones)</div>
+      <div class="seg"><input type="radio" name="psf" id="psf1" value="1"><label for="psf1">Yes</label><input type="radio" name="psf" id="psf0" value="0" checked><label for="psf0">No</label><input type="radio" name="psf" id="psfx" value="x"><label for="psfx">Not imaged</label></div>
+      <span class="pts" id="p_psf"></span></div>
+    <div class="row"><div class="lbl">Collapsed vertebrae / reduced vertebral density <small>Not scored — used only to interpret a score &lt;15%</small></div>
+      <div class="seg"><input type="radio" name="vert" id="vert1" value="1"><label for="vert1">Present</label><input type="radio" name="vert" id="vert0" value="0"><label for="vert0">Normal spine</label><input type="radio" name="vert" id="vertx" value="x" checked><label for="vertx">Unknown</label></div></div>
+  </div>
+
+  <div class="card no-print">
+    <h2>Options</h2>
+    <div class="row"><div class="lbl">ALP banding
+      <small>Original bands are in 1983 assay IU/L (75 / 100 / 200 / 300). “× ULN” rescales them to your lab, assuming the lowest scoring threshold (75) was the original upper limit — an unvalidated adaptation.</small></div>
+      <div class="seg"><input type="radio" name="alpMode" id="am0" value="abs" checked><label for="am0">Original IU/L</label><input type="radio" name="alpMode" id="am1" value="uln"><label for="am1">× local ULN</label></div>
+      <span class="num" id="ulnWrap" style="display:none">ULN <input type="number" id="uln" value="120" step="1" min="1"> IU/L</span></div>
+  </div>
+</section>
+
+<aside>
+  <div class="card">
+    <h2>Result</h2>
+    <div class="print-only" id="printHead"></div>
+    <div class="score"><div class="big" id="pct">—</div><div class="sub" id="frac">points</div></div>
+    <div class="bar"><div class="mk" id="mk" style="left:0"></div></div>
+    <div class="ticks"><span style="left:0%">0</span><span style="left:15%">15</span><span style="left:35%">35</span><span style="left:100%">100</span></div>
+    <div class="verdict v-na" id="verdict"></div>
+    <div id="warns"></div>
+    <table><thead><tr><th>Parameter</th><th>Input</th><th class="r">Pts</th><th class="r">Max</th></tr></thead><tbody id="tbl"></tbody></table>
+
+    <details>
+      <summary>Post-test probability at your pre-test probability</summary>
+      <p class="notes">Uses the paper's operating point for index &gt;20% (sensitivity 96%, specificity 93%, Table 5; derived in the same 41 patients, so optimistic).</p>
+      <div class="row" style="border:0"><div class="lbl">Pre-test probability of osteomalacia</div><span class="num"><input type="range" id="pre" min="1" max="95" value="20"><b id="preTxt">20%</b></span></div>
+      <div id="post" class="notes"></div>
+    </details>
+
+    <div class="btns no-print"><button class="primary" onclick="window.print()">Print</button><button onclick="resetAll()">Reset</button></div>
+  </div>
+</aside>
+
+<section class="card" style="grid-column:1/-1">
+  <h2>Scoring (Table 1) and caveats</h2>
+  <table>
+    <thead><tr><th>Parameter</th><th>Criterion → points</th><th class="r">Max</th></tr></thead>
+    <tbody>
+      <tr><td>Limb pain</td><td>Present → 1</td><td class="r">1</td></tr>
+      <tr><td>Proximal myopathy</td><td>Present → 1</td><td class="r">1</td></tr>
+      <tr><td>Ca × P product (mmol²/L²)</td><td>1.62–2.41 → 1 · 1.21–1.61 → 2 · &lt;1.21 → 3 · ≥2.42 → 0</td><td class="r">3</td></tr>
+      <tr><td>ALP (IU/L), LFTs normal</td><td>75–100 → 1 · 101–200 → 2 · 201–300 → 3 · &gt;300 → 4</td><td class="r">4</td></tr>
+      <tr><td>25(OH)D (nmol/L)</td><td>5–12.5 → 1 · &lt;5 → 2</td><td class="r">2</td></tr>
+      <tr><td>Pseudofractures</td><td>Present → 1</td><td class="r">1</td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Interpretation: &gt;35% osteomalacia · 15–35% bone biopsy indicated · &lt;15% no osteomalacia (osteoporosis if collapsed vertebrae; neither if spine normal). The published Table 1 prints the second ALP band as “101–201”; 101–200 is used here. The algorithm reproduces all 41 published index scores in Table 3.</p>
+  <ul class="notes">
+    <li><b>Derivation only.</b> 41 retrospective patients (26 osteomalacia, 15 osteoporosis) chosen at the diagnostic extremes; the cut-offs and weights were fitted to this sample and never prospectively validated in the paper. Expect performance to be lower in unselected patients.</li>
+    <li><b>Reference standard.</b> Osteomalacia was defined by osteoid volume &gt;2.4% without tetracycline labelling — not the current mineralisation-lag-time definition. Some “osteomalacia” cases may have been high-turnover states.</li>
+    <li><b>Assay drift.</b> ALP and 25(OH)D thresholds reflect 1980s assays. The 25(OH)D bands (&lt;12.5 nmol/L) capture only profound deficiency by modern standards; current ALP methods have different reference ranges.</li>
+    <li><b>Not for CKD.</b> All subjects had normal renal function; the Ca × P and ALP bands do not apply in CKD-MBD. Primary hyperparathyroidism, hyperthyroidism and Paget's disease were also excluded.</li>
+    <li>Collapsed vertebrae were present in 35% of the osteomalacia group, so vertebral fractures do not exclude osteomalacia.</li>
+  </ul>
+  <p class="ref">McKenna MJ, Freaney R, Casey OM, Towers RP, Muldowney FP. Osteomalacia and osteoporosis: evaluation of a diagnostic index. J Clin Pathol 1983;36:245–252. doi:10.1136/jcp.36.3.245. Decision support only; does not replace clinical judgement or histomorphometry.</p>
+</section>
+</main>
+
+<script>
+/*SCORE-START*/
+// Pure scoring function. Units: ca, po in mmol/L; vd in nmol/L; alp in IU/L.
+// Missing (null) or excluded parameters are removed from the denominator.
+function scoreIndex(x){
+  const items=[];
+  items.push({k:'limb',max:1,pts:x.limb?1:0});
+  items.push({k:'myo',max:1,pts:x.myo?1:0});
+  if(x.ca!=null && x.po!=null){
+    const p=x.ca*x.po, r=Math.round(p*100)/100;
+    items.push({k:'cap',max:3,pts: r<1.21?3 : r<1.62?2 : r<2.42?1 : 0, val:p});
+  } else items.push({k:'cap',max:3,pts:0,excluded:true});
+  if(x.alp!=null && !x.alpEx){
+    const a = x.alpMode==='uln' ? x.alp/x.uln*75 : x.alp;
+    items.push({k:'alp',max:4,pts: a>300?4 : a>200?3 : a>100?2 : a>=75?1 : 0, val:x.alp});
+  } else items.push({k:'alp',max:4,pts:0,excluded:true});
+  if(x.vd!=null && !x.vdEx){
+    items.push({k:'vd',max:2,pts: x.vd<5?2 : x.vd<=12.5?1 : 0, val:x.vd});
+  } else items.push({k:'vd',max:2,pts:0,excluded:true});
+  if(x.psf!=null) items.push({k:'psf',max:1,pts:x.psf?1:0});
+  else items.push({k:'psf',max:1,pts:0,excluded:true});
+  const used=items.filter(i=>!i.excluded);
+  const total=used.reduce((s,i)=>s+i.pts,0), possible=used.reduce((s,i)=>s+i.max,0);
+  const pct= possible ? total/possible*100 : null;
+  const band= pct==null?null : pct>35?'om' : pct>=15?'bx' : 'lo';
+  return {items,total,possible,pct,band};
+}
+/*SCORE-END*/
+
+const $=id=>document.getElementById(id);
+const radio=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:null};
+const num=id=>{const v=$(id).value.trim();return v===''?null:parseFloat(v)};
+const NAMES={limb:'Limb pain',myo:'Proximal myopathy',cap:'Ca × P product',alp:'Alkaline phosphatase',vd:'25(OH)D',psf:'Pseudofractures'};
+
+function gather(){
+  let ca=num('ca'), po=num('po'), vd=num('vd');
+  if(ca!=null && $('caU').value==='mg') ca=ca/4.008;
+  if(po!=null && $('poU').value==='mg') po=po/3.097;
+  if(vd!=null && $('vdU').value==='ng') vd=vd*2.496;
+  const psf=radio('psf');
+  return {limb:radio('limb')==='1', myo:radio('myo')==='1', ca, po,
+    alp:num('alp'), alpEx:$('alpEx').checked, alpMode:radio('alpMode'), uln:num('uln')||75,
+    vd, vdEx:$('vdEx').checked, psf: psf==='x'?null:psf==='1'};
+}
+
+function inputText(it,x){
+  if(it.excluded){
+    if(it.k==='alp' && x.alpEx) return 'excluded (LFTs)';
+    if(it.k==='vd' && x.vdEx) return 'excluded (suppl.)';
+    return 'not available';
+  }
+  switch(it.k){
+    case 'limb': return x.limb?'yes':'no';
+    case 'myo': return x.myo?'yes':'no';
+    case 'cap': return it.val.toFixed(2)+' mmol²/L²';
+    case 'alp': return Math.round(it.val)+' IU/L';
+    case 'vd': return it.val.toFixed(1)+' nmol/L';
+    case 'psf': return x.psf?'yes':'no';
+  }
+}
+
+function render(){
+  const x=gather(), r=scoreIndex(x);
+  $('ulnWrap').style.display = x.alpMode==='uln'?'inline-flex':'none';
+  r.items.forEach(it=>{const el=$('p_'+it.k); if(el) el.textContent = it.excluded?'—':`${it.pts} / ${it.max}`;});
+  const cap=r.items.find(i=>i.k==='cap');
+  $('capTxt').textContent = cap.excluded ? 'Ca × P product: — (enter both values)' : `Ca × P product: ${cap.val.toFixed(2)} mmol²/L²` + (($('caU').value==='mg' || $('poU').value==='mg') ? ` (Ca ${x.ca.toFixed(2)}, P ${x.po.toFixed(2)} mmol/L)` : '');
+  $('vdTxt').textContent = (x.vd!=null && $('vdU').value==='ng') ? `= ${x.vd.toFixed(1)} nmol/L` : '';
+  $('alpTxt').textContent = (x.alpMode==='uln' && x.alp!=null) ? `= ${(x.alp/x.uln).toFixed(2)} × ULN (≈ ${Math.round(x.alp/x.uln*75)} IU/L on the original scale)` : '';
+
+  $('pct').textContent = r.pct==null?'—':Math.round(r.pct)+'%';
+  $('frac').textContent = `${r.total} of ${r.possible} possible points`;
+  $('mk').style.left = (r.pct==null?0:Math.min(100,r.pct))+'%';
+
+  const vert=radio('vert'), v=$('verdict');
+  if(r.band==='om'){v.className='verdict v-om';v.innerHTML='<b>Osteomalacia</b>Score &gt;35%: the authors considered biopsy unnecessary to confirm osteomalacia in this range.';}
+  else if(r.band==='bx'){v.className='verdict v-bx';v.innerHTML='<b>Indeterminate — bone biopsy indicated</b>Score 15–35%: the index does not discriminate; tetracycline-labelled iliac crest biopsy for definitive diagnosis.';}
+  else if(r.band==='lo'){
+    v.className='verdict v-op';
+    const tail = vert==='1' ? 'With collapsed vertebrae / reduced vertebral density: <b style="display:inline">osteoporosis</b> (or osteopenia).'
+      : vert==='0' ? 'With a normal spinal X-ray: neither osteomalacia nor osteoporosis suggested.'
+      : 'Interpretation depends on the spine: osteoporosis if collapsed vertebrae, neither if normal.';
+    v.innerHTML='<b>Osteomalacia unlikely</b>Score &lt;15% excluded osteomalacia in all but one derivation case. '+tail;
+  } else {v.className='verdict v-na';v.textContent='No parameters available.';}
+
+  const w=[];
+  if(radio('renal')==='1') w.push('Impaired renal function: outside the derivation population. Ca × P and ALP bands are not valid in CKD-MBD — interpret with caution or not at all.');
+  if(r.possible<8) w.push(`Only ${r.possible} possible points: fewer than any derivation patient (minimum 8). Percentages on a small denominator are unstable.`);
+  if(r.pct!=null && Math.abs(r.pct-15)<=3 || r.pct!=null && Math.abs(r.pct-35)<=3) w.push('Score lies within one point-step of a cut-off; a single parameter changes the category.');
+  if(x.alpMode==='uln') w.push('ALP scored on the unvalidated × ULN rescaling.');
+  $('warns').innerHTML = w.map(s=>`<div class="warn">${s}</div>`).join('');
+
+  $('tbl').innerHTML = r.items.map(it=>`<tr class="${it.excluded?'ex':''}"><td>${NAMES[it.k]}</td><td>${inputText(it,x)}</td><td class="r">${it.excluded?'—':it.pts}</td><td class="r">${it.excluded?'—':it.max}</td></tr>`).join('')
+    + `<tr><th>Total</th><th></th><th class="r">${r.total}</th><th class="r">${r.possible}</th></tr>`;
+
+  const pre=+$('pre').value/100, se=.96, sp=.93;
+  $('preTxt').textContent=Math.round(pre*100)+'%';
+  const ppv=se*pre/(se*pre+(1-sp)*(1-pre)), npv=sp*(1-pre)/(sp*(1-pre)+(1-se)*pre);
+  const pos = r.pct!=null && r.pct>20;
+  $('post').innerHTML = `Index &gt;20%: probability of osteomalacia <b>${(ppv*100).toFixed(0)}%</b> · Index ≤20%: probability <b>${((1-npv)*100).toFixed(1)}%</b>.`
+    + (r.pct!=null ? `<br>This patient is ${pos?'<b>above</b>':'<b>at or below</b>'} 20% → ${pos?(ppv*100).toFixed(0):((1-npv)*100).toFixed(1)}%.` : '');
+
+  const pid=$('pid').value.trim(), d=new Date().toLocaleDateString('en-GB');
+  $('printHead').innerHTML = `<p style="margin:0 0 6px"><b>${pid?pid.replace(/</g,'&lt;'):'Patient'}</b> · ${d}</p>`;
+}
+
+function resetAll(){
+  document.querySelectorAll('input[type=number],input[type=text]').forEach(e=>{if(e.id!=='uln')e.value='';});
+  document.querySelectorAll('input[type=checkbox]').forEach(e=>e.checked=false);
+  ['ren0','limb0','myo0','psf0','vertx','am0'].forEach(id=>$(id).checked=true);
+  render();
+}
+document.addEventListener('input',render);
+document.addEventListener('change',render);
+render();
+</script>
+</body>
+</html>
